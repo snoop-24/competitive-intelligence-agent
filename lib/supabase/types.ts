@@ -22,6 +22,7 @@ export interface Signal {
   url: string
   fetched_at: string
   is_meaningful: boolean | null
+  content_hash: string | null
 }
 
 export interface Briefing {
@@ -41,4 +42,11 @@ export interface BriefingItem {
   interpretation: string
   severity: 'high' | 'medium' | 'low'
   source_urls: string[]
+}
+
+export interface ProcessedNewsUrl {
+  id: string
+  workspace_id: string
+  url: string
+  processed_at: string
 }

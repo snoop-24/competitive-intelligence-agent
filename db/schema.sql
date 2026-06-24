@@ -84,3 +84,19 @@ CREATE POLICY "workspace_owner_all" ON briefing_items
       )
     )
   );
+
+-- v2: change detection
+ALTER TABLE signals ADD COLUMN IF NOT EXISTS content_hash text;
+CREATE INDEX IF NOT EXISTS signals_competitor_hash ON signals(competitor_id, content_hash);
+
+-- v2: news deduplication
+CREATE TABLE IF NOT EXISTS processed_news_urls (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id uuid REFERENCES workspaces(id) ON DELETE CASCADE,
+  url text NOT NULL,
+  processed_at timestamptz DEFAULT now(),
+  UNIQUE(workspace_id, url)
+);
+ALTER TABLE processed_news_urls ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "workspace members only" ON processed_news_urls
+  USING (workspace_id IN (SELECT id FROM workspaces WHERE owner_id = auth.uid()));
