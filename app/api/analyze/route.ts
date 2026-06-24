@@ -5,6 +5,8 @@ import { fetchNews } from '@/lib/news'
 import { judgeSignals, extractObservations, generateBriefing, type RawSignal } from '@/lib/synthesizer'
 import type { Competitor } from '@/lib/supabase/types'
 
+export const maxDuration = 60
+
 export async function POST() {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
