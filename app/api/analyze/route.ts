@@ -3,6 +3,8 @@ import { createServerClient } from '@/lib/supabase/server'
 import { scrapeUrl } from '@/lib/scraper'
 import { fetchNews } from '@/lib/news'
 import { judgeSignals, extractObservations, generateBriefing, type RawSignal } from '@/lib/synthesizer'
+import { sendBriefingEmail, sendHighSeverityAlert } from '@/lib/email'
+import { sha256 } from '@/lib/hash'
 import type { Competitor } from '@/lib/supabase/types'
 
 export const maxDuration = 60
@@ -23,7 +25,6 @@ export async function POST() {
       }
 
       try {
-        // Get workspace
         const { data: workspace } = await supabase
           .from('workspaces')
           .select('id')
@@ -31,14 +32,12 @@ export async function POST() {
           .single()
         if (!workspace) { send('error', { message: 'No workspace found' }); controller.close(); return }
 
-        // Get competitors
         const { data: competitors } = await supabase
           .from('competitors')
           .select('*')
           .eq('workspace_id', workspace.id)
         if (!competitors?.length) { send('error', { message: 'Add at least one competitor first' }); controller.close(); return }
 
-        // Create briefing record
         const { data: briefing } = await supabase
           .from('briefings')
           .insert({ workspace_id: workspace.id, status: 'generating' })
@@ -46,12 +45,26 @@ export async function POST() {
           .single()
         if (!briefing) { send('error', { message: 'Failed to create briefing' }); controller.close(); return }
 
-        // Scrape competitor websites
+        // ── Scrape websites with change detection ─────────────────────────
         send('progress', { message: 'Fetching competitor websites...' })
         const signals: RawSignal[] = []
+
         for (const competitor of competitors as Competitor[]) {
           try {
             const content = await scrapeUrl(competitor.website_url)
+            const hash = await sha256(content)
+
+            // skip if we already processed this exact content
+            const { data: existing } = await supabase
+              .from('signals')
+              .select('id')
+              .eq('competitor_id', competitor.id)
+              .eq('content_hash', hash)
+              .limit(1)
+              .single()
+
+            if (existing) continue // unchanged since last run
+
             signals.push({
               competitor_id: competitor.id,
               competitor_name: competitor.name,
@@ -59,17 +72,37 @@ export async function POST() {
               raw_content: content.slice(0, 3000),
               url: competitor.website_url,
             })
-          } catch {
-            // Skip failed scrapes — don't abort the whole run
-          }
+
+            await supabase.from('signals').insert({
+              competitor_id: competitor.id,
+              source_type: 'website',
+              raw_content: content.slice(0, 3000),
+              url: competitor.website_url,
+              content_hash: hash,
+              is_meaningful: null,
+            })
+          } catch { /* skip failed scrapes */ }
         }
 
-        // Fetch news
+        // ── Fetch news with URL deduplication ────────────────────────────
         send('progress', { message: 'Fetching news coverage...' })
+
         for (const competitor of competitors as Competitor[]) {
           try {
             const newsItems = await fetchNews(competitor.name)
-            for (const item of newsItems) {
+            const urls = newsItems.map(i => i.link)
+
+            // find which URLs we've already processed for this workspace
+            const { data: seen } = await supabase
+              .from('processed_news_urls')
+              .select('url')
+              .eq('workspace_id', workspace.id)
+              .in('url', urls)
+            const seenUrls = new Set((seen ?? []).map(r => r.url))
+
+            const newItems = newsItems.filter(i => !seenUrls.has(i.link))
+
+            for (const item of newItems) {
               signals.push({
                 competitor_id: competitor.id,
                 competitor_name: competitor.name,
@@ -78,39 +111,44 @@ export async function POST() {
                 url: item.link,
               })
             }
-          } catch {
-            // Skip failed news fetches
-          }
+
+            if (newItems.length > 0) {
+              await supabase.from('processed_news_urls').upsert(
+                newItems.map(i => ({ workspace_id: workspace.id, url: i.link })),
+                { onConflict: 'workspace_id,url' }
+              )
+            }
+          } catch { /* skip failed news */ }
         }
 
-        // Judge signals
-        send('progress', { message: `Judging signal relevance (${signals.length} signals found)...` })
+        // ── Judge signals ──────────────────────────────────────────────────
+        send('progress', { message: `Analyzing signal relevance (${signals.length} signals found)...` })
         const judged = await judgeSignals(signals)
         const meaningfulCount = judged.filter(s => s.is_meaningful).length
         send('progress', { message: `${meaningfulCount} meaningful signals identified` })
 
-        // Save signals to DB
-        if (signals.length > 0) {
+        // persist news signals to DB with is_meaningful classification
+        const newsJudged = judged.filter(s => s.source_type === 'news')
+        if (newsJudged.length > 0) {
           await supabase.from('signals').insert(
-            signals.map(s => ({
-              competitor_id: s.competitor_id,
-              source_type: s.source_type,
-              raw_content: s.raw_content,
-              url: s.url,
-              is_meaningful: judged.find(j => j.url === s.url && j.competitor_id === s.competitor_id)?.is_meaningful ?? false,
+            newsJudged.map(j => ({
+              competitor_id: j.competitor_id,
+              source_type: 'news',
+              raw_content: j.raw_content.slice(0, 3000),
+              url: j.url,
+              is_meaningful: j.is_meaningful,
             }))
           )
         }
 
-        // Extract observations
+        // ── Extract observations ───────────────────────────────────────────
         send('progress', { message: 'Extracting structured observations...' })
         const observations = await extractObservations(judged, competitors as Competitor[])
 
-        // Generate briefing
+        // ── Generate briefing ──────────────────────────────────────────────
         send('progress', { message: 'Generating strategic briefing...' })
         const result = await generateBriefing(observations, competitors as Competitor[])
 
-        // Save briefing to DB
         await supabase
           .from('briefings')
           .update({ status: 'complete', executive_summary: result.executive_summary })
@@ -130,6 +168,18 @@ export async function POST() {
                 source_urls: [],
               }))
           )
+        }
+
+        // ── Email alerts ───────────────────────────────────────────────────
+        const highItems = result.items.filter(i => i.severity === 'high' && i.competitor_id)
+        if (highItems.length > 0) {
+          try {
+            await sendHighSeverityAlert({
+              to: user.email!,
+              items: highItems as unknown as Parameters<typeof sendHighSeverityAlert>[0]['items'],
+              competitors: competitors as Competitor[],
+            })
+          } catch { /* non-fatal */ }
         }
 
         send('complete', { briefing_id: briefing.id })

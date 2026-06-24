@@ -59,3 +59,41 @@ export async function sendBriefingEmail({
     `,
   })
 }
+
+export async function sendHighSeverityAlert({
+  to,
+  items,
+  competitors,
+}: {
+  to: string
+  items: BriefingItem[]
+  competitors: Competitor[]
+}) {
+  const itemsHtml = items.map(item => {
+    const competitor = competitors.find(c => c.id === item.competitor_id)
+    return `
+      <div style="border-left:4px solid #dc2626;padding:12px 16px;margin-bottom:12px;background:#fff5f5;border-radius:0 8px 8px 0;">
+        <strong style="font-size:14px;color:#111827;">${competitor?.name ?? 'Unknown'}</strong>
+        <span style="font-size:12px;color:#dc2626;margin-left:8px;text-transform:capitalize;">${item.category}</span>
+        <p style="font-size:14px;color:#374151;margin:8px 0;">${item.observation}</p>
+        <p style="font-size:13px;color:#7c3aed;font-style:italic;">${item.interpretation}</p>
+      </div>
+    `
+  }).join('')
+
+  const competitorNames = [...new Set(items.map(i => competitors.find(c => c.id === i.competitor_id)?.name ?? 'Unknown'))].join(', ')
+
+  await resend.emails.send({
+    from: 'IntelAgent Alerts <onboarding@resend.dev>',
+    to,
+    subject: `🚨 Urgent competitive signal: ${competitorNames}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+        <h1 style="font-size:18px;font-weight:700;color:#dc2626;margin-bottom:4px;">High-Priority Alert</h1>
+        <p style="font-size:14px;color:#6b7280;margin-bottom:20px;">${items.length} urgent signal${items.length !== 1 ? 's' : ''} detected</p>
+        ${itemsHtml}
+        <p style="font-size:12px;color:#9ca3af;margin-top:24px;">View your full briefing in <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/briefings" style="color:#4f46e5;">IntelAgent</a></p>
+      </div>
+    `,
+  })
+}
