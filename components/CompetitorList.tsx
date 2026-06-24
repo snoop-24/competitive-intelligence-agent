@@ -38,11 +38,12 @@ export function CompetitorList({ competitors }: { competitors: Competitor[] }) {
     setDeleting(id)
     setDeleteError(null)
     const res = await fetch(`/api/competitors/${id}`, { method: 'DELETE' })
+    setDeleting(null)
     if (!res.ok) {
       setDeleteError('Failed to remove competitor')
+    } else {
+      router.refresh()
     }
-    setDeleting(null)
-    router.refresh()
   }
 
   if (competitors.length === 0) {
