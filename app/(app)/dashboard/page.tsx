@@ -7,7 +7,6 @@ export default async function DashboardPage() {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Auto-create workspace if first login
   let { data: workspace } = await supabase
     .from('workspaces')
     .select('id, name')
@@ -23,24 +22,8 @@ export default async function DashboardPage() {
     workspace = data
   }
 
-  // Seed demo competitors if workspace is new and has none
-  if (workspace) {
-    const { count } = await supabase
-      .from('competitors')
-      .select('*', { count: 'exact', head: true })
-      .eq('workspace_id', workspace.id)
-
-    if (count === 0) {
-      await supabase.from('competitors').insert([
-        { workspace_id: workspace.id, name: 'Notion', website_url: 'https://notion.so/pricing', description: 'All-in-one workspace' },
-        { workspace_id: workspace.id, name: 'Linear', website_url: 'https://linear.app/pricing', description: 'Issue tracking for software teams' },
-        { workspace_id: workspace.id, name: 'Asana', website_url: 'https://asana.com/pricing', description: 'Project management platform' },
-      ])
-    }
-  }
-
   const competitors: Competitor[] = workspace
-    ? (await supabase.from('competitors').select('*').eq('workspace_id', workspace.id)).data ?? []
+    ? (await supabase.from('competitors').select('*').eq('workspace_id', workspace.id).order('created_at')).data ?? []
     : []
 
   const latestBriefing: Briefing | null = workspace
@@ -49,70 +32,85 @@ export default async function DashboardPage() {
     : null
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Intelligence Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">{workspace?.name}</p>
-        </div>
-        <Link href="/competitors" className="text-sm bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200">
-          Manage Competitors
-        </Link>
+    <div className="max-w-4xl mx-auto px-8 py-10 space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">{workspace?.name}</p>
       </div>
 
-      <section className="bg-white border rounded-xl p-6 space-y-4">
-        <div>
-          <h2 className="font-semibold">Generate Competitive Briefing</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Monitors {competitors.length} competitor{competitors.length !== 1 ? 's' : ''} across web and news.
-          </p>
-        </div>
-        {competitors.length === 0 ? (
-          <p className="text-sm text-orange-500">
-            Add competitors first. <Link href="/competitors" className="underline">Add now →</Link>
-          </p>
-        ) : (
-          <GenerateButton />
-        )}
-      </section>
-
-      {latestBriefing && (
-        <section className="bg-white border rounded-xl p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold">Latest Briefing</h2>
-            <Link href={`/briefings/${latestBriefing.id}`} className="text-sm text-blue-600 hover:underline">
-              View full →
-            </Link>
+      {competitors.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
           </div>
-          <p className="text-sm text-gray-400 mb-3">
-            {new Date(latestBriefing.generated_at).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          <h3 className="text-base font-semibold text-gray-900 mb-1">No competitors tracked yet</h3>
+          <p className="text-sm text-gray-500 mb-5 max-w-xs mx-auto">
+            Add your first competitor to start generating AI-powered intelligence briefings.
           </p>
-          <p className="text-sm text-gray-700 leading-relaxed">{latestBriefing.executive_summary}</p>
-        </section>
-      )}
-
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-sm text-gray-500 uppercase">Competitors Being Tracked</h2>
+          <Link
+            href="/competitors"
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+          >
+            Add Competitor
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
-        {competitors.length === 0 ? (
-          <p className="text-sm text-gray-400">No competitors yet.</p>
-        ) : (
-          <ul className="space-y-2">
-            {competitors.map(c => (
-              <li key={c.id} className="flex items-center gap-3 bg-white border rounded-lg px-4 py-3">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
-                  {c.name[0]}
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+              <h2 className="font-semibold text-gray-900 mb-1">Generate Briefing</h2>
+              <p className="text-sm text-gray-500 mb-4">
+                Monitors {competitors.length} competitor{competitors.length !== 1 ? 's' : ''} across web and news, then synthesizes strategic insights.
+              </p>
+              <GenerateButton />
+            </div>
+
+            {latestBriefing && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold text-gray-900">Latest Briefing</h2>
+                  <Link href={`/briefings/${latestBriefing.id}`} className="text-sm text-indigo-600 hover:underline">
+                    View full →
+                  </Link>
                 </div>
-                <div>
-                  <p className="text-sm font-medium">{c.name}</p>
-                  <p className="text-xs text-gray-400 truncate max-w-xs">{c.website_url}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                <p className="text-xs text-gray-400 mb-3">
+                  {new Date(latestBriefing.generated_at).toLocaleDateString('en-US', {
+                    weekday: 'long', month: 'long', day: 'numeric',
+                  })}
+                </p>
+                <p className="text-sm text-gray-700 leading-relaxed">{latestBriefing.executive_summary}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Tracked</h2>
+                <Link href="/competitors" className="text-xs text-indigo-600 hover:underline">Manage</Link>
+              </div>
+              <ul className="space-y-3">
+                {competitors.map(c => (
+                  <li key={c.id} className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs flex-shrink-0">
+                      {c.name[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{c.name}</p>
+                      <p className="text-xs text-gray-400 truncate">{c.website_url}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
