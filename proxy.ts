@@ -23,8 +23,11 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAuthPath = request.nextUrl.pathname.startsWith('/login') ||
-    request.nextUrl.pathname.startsWith('/signup')
+  const isAuthPath =
+    request.nextUrl.pathname.startsWith('/login') ||
+    request.nextUrl.pathname.startsWith('/signup') ||
+    request.nextUrl.pathname.startsWith('/forgot-password') ||
+    request.nextUrl.pathname.startsWith('/reset-password')
 
   if (!user && !isAuthPath && request.nextUrl.pathname !== '/') {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -38,5 +41,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon\\.ico).*)'],
+  // exclude /api, /auth (callback route), and Next.js internals
+  matcher: ['/((?!api|auth|_next/static|_next/image|favicon\\.ico).*)'],
 }
