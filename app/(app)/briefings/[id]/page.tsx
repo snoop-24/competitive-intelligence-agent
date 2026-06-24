@@ -44,43 +44,52 @@ export default async function BriefingDetailPage({
   })
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 space-y-6">
+    <div className="max-w-4xl mx-auto px-8 py-10 space-y-6">
       {emailed === 'true' && (
-        <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
-          Briefing emailed successfully!
+        <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium">
+          Briefing emailed successfully.
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <Link href="/briefings" className="text-sm text-blue-600 hover:underline">← All Briefings</Link>
-        <a href={`/api/briefings/${id}/email`} className="text-sm bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200">
-          Email this briefing
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <Link href="/briefings" className="text-sm text-indigo-600 hover:underline mb-2 inline-block">
+            ← All Briefings
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">Competitive Briefing</h1>
+          <p className="text-sm text-gray-400 mt-1">
+            {new Date(briefing.generated_at).toLocaleDateString('en-US', {
+              weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+              hour: '2-digit', minute: '2-digit',
+            })}
+          </p>
+        </div>
+        <a
+          href={`/api/briefings/${id}/email`}
+          className="flex-shrink-0 inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 hover:border-gray-300 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Email briefing
         </a>
       </div>
 
-      <div>
-        <h1 className="text-2xl font-bold">Competitive Briefing</h1>
-        <p className="text-sm text-gray-400 mt-1">
-          {new Date(briefing.generated_at).toLocaleDateString('en-US', {
-            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-          })}
-        </p>
-      </div>
-
       {briefing.executive_summary && (
-        <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-6">
-          <h2 className="text-xs font-semibold text-blue-400 uppercase mb-2">Executive Summary</h2>
+        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-6">
+          <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-2">Executive Summary</p>
           <p className="text-gray-800 leading-relaxed">{briefing.executive_summary}</p>
-        </section>
+        </div>
       )}
 
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase">
+      <div className="space-y-4">
+        <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
           {sortedItems.length} Finding{sortedItems.length !== 1 ? 's' : ''}
-        </h2>
+        </p>
         {sortedItems.length === 0 ? (
-          <p className="text-sm text-gray-400">No significant signals detected this period.</p>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
+            <p className="text-sm text-gray-500">No significant signals detected this period.</p>
+          </div>
         ) : (
           sortedItems.map(item => (
             <BriefingItemCard
@@ -90,7 +99,7 @@ export default async function BriefingDetailPage({
             />
           ))
         )}
-      </section>
+      </div>
     </div>
   )
 }
