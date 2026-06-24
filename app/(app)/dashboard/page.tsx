@@ -23,6 +23,22 @@ export default async function DashboardPage() {
     workspace = data
   }
 
+  // Seed demo competitors if workspace is new and has none
+  if (workspace) {
+    const { count } = await supabase
+      .from('competitors')
+      .select('*', { count: 'exact', head: true })
+      .eq('workspace_id', workspace.id)
+
+    if (count === 0) {
+      await supabase.from('competitors').insert([
+        { workspace_id: workspace.id, name: 'Notion', website_url: 'https://notion.so/pricing', description: 'All-in-one workspace' },
+        { workspace_id: workspace.id, name: 'Linear', website_url: 'https://linear.app/pricing', description: 'Issue tracking for software teams' },
+        { workspace_id: workspace.id, name: 'Asana', website_url: 'https://asana.com/pricing', description: 'Project management platform' },
+      ])
+    }
+  }
+
   const competitors: Competitor[] = workspace
     ? (await supabase.from('competitors').select('*').eq('workspace_id', workspace.id)).data ?? []
     : []
