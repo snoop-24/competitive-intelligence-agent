@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient()
   const { data: workspaces } = await supabase.from('workspaces').select('*')
-  if (!workspaces?.length) return NextResponse.json({ ok: true, processed: 0 })
+  if (!workspaces?.length) return NextResponse.json({ processed: 0 })
 
   let processed = 0
 
@@ -161,5 +161,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, processed })
+  return NextResponse.json({ processed })
 }
