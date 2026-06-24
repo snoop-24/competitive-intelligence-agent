@@ -32,6 +32,11 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setLoading(false)
+      return
+    }
     const { error } = await supabase.auth.updateUser({ password })
     if (error) { setError(error.message); setLoading(false); return }
     router.push('/dashboard')
@@ -53,7 +58,7 @@ export default function ResetPasswordPage() {
                 type={showPassword ? 'text' : 'password'}
                 value={password} onChange={e => setPassword(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="Min 6 characters" required minLength={6}
+                placeholder="Min 6 characters" required
               />
               <button
                 type="button" onClick={() => setShowPassword(p => !p)}
