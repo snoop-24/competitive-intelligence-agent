@@ -2,7 +2,6 @@ import { createServerClient } from '@/lib/supabase/server'
 import { AddCompetitorForm } from '@/components/AddCompetitorForm'
 import { CompetitorList } from '@/components/CompetitorList'
 import type { Competitor } from '@/lib/supabase/types'
-import Link from 'next/link'
 
 export default async function CompetitorsPage() {
   const supabase = await createServerClient()
@@ -19,21 +18,15 @@ export default async function CompetitorsPage() {
     : []
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Competitors</h1>
-        <Link href="/dashboard" className="text-sm text-blue-600 hover:underline">← Dashboard</Link>
+    <div className="max-w-4xl mx-auto px-8 py-10 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Competitors</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          {competitors.length} competitor{competitors.length !== 1 ? 's' : ''} tracked
+        </p>
       </div>
-      <section>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase mb-3">Add Competitor</h2>
-        <AddCompetitorForm />
-      </section>
-      <section>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase mb-3">
-          Tracking {competitors.length} competitor{competitors.length !== 1 ? 's' : ''}
-        </h2>
-        <CompetitorList competitors={competitors} />
-      </section>
+      <AddCompetitorForm />
+      <CompetitorList competitors={competitors} />
     </div>
   )
 }
