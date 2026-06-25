@@ -41,7 +41,7 @@ export function AddCompetitorForm() {
           <input
             placeholder="e.g. Notion" value={name}
             onChange={e => setName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             required
           />
         </div>
@@ -50,7 +50,7 @@ export function AddCompetitorForm() {
           <input
             placeholder="https://competitor.com/pricing" value={url}
             onChange={e => setUrl(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             required type="url"
           />
         </div>
@@ -60,7 +60,7 @@ export function AddCompetitorForm() {
         <input
           placeholder="Brief description of what they do" value={description}
           onChange={e => setDescription(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
         />
       </div>
       {error && (
@@ -68,7 +68,7 @@ export function AddCompetitorForm() {
       )}
       <button
         type="submit" disabled={loading}
-        className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+        className="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors"
       >
         {loading ? 'Adding...' : 'Add Competitor'}
       </button>

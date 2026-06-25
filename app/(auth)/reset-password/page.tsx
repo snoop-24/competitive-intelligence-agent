@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
         <div className="mb-8 text-center">
-          <span className="text-2xl font-bold text-indigo-600">IntelAgent</span>
+          <span className="text-2xl font-bold text-violet-600">IntelAgent</span>
           <h1 className="text-xl font-semibold text-gray-900 mt-4">Set new password</h1>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 placeholder="Min 6 characters" required
               />
               <button
@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
           )}
           <button
             type="submit" disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 text-sm transition-colors"
+            className="w-full bg-violet-600 text-white py-2.5 rounded-lg font-medium hover:bg-violet-700 disabled:opacity-50 text-sm transition-colors"
           >
             {loading ? 'Saving...' : 'Set new password'}
           </button>

@@ -10,7 +10,7 @@ function CompetitorFavicon({ url, name }: { url: string; name: string }) {
 
   if (failed || !domain) {
     return (
-      <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm flex-shrink-0">
+      <div className="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-sm flex-shrink-0">
         {name[0]?.toUpperCase() ?? '?'}
       </div>
     )
@@ -67,7 +67,7 @@ export function CompetitorList({ competitors }: { competitors: Competitor[] }) {
               <p className="font-medium text-sm text-gray-900">{c.name}</p>
               <a
                 href={c.website_url} target="_blank" rel="noreferrer"
-                className="text-xs text-indigo-600 hover:underline truncate block max-w-sm"
+                className="text-xs text-violet-600 hover:underline truncate block max-w-sm"
               >
                 {c.website_url}
               </a>

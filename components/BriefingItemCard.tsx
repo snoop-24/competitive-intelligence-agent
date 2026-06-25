@@ -50,9 +50,9 @@ export function BriefingItemCard({
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">What changed</p>
             <p className="text-sm text-gray-700 leading-relaxed">{item.observation}</p>
           </div>
-          <div className="bg-indigo-50 rounded-lg p-3.5">
-            <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-1">Strategic interpretation</p>
-            <p className="text-sm text-indigo-900 leading-relaxed">{item.interpretation}</p>
+          <div className="bg-violet-50 rounded-lg p-3.5">
+            <p className="text-xs font-semibold text-violet-500 uppercase tracking-wide mb-1">Strategic interpretation</p>
+            <p className="text-sm text-violet-900 leading-relaxed">{item.interpretation}</p>
           </div>
         </div>
       </div>

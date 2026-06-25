@@ -53,7 +53,7 @@ export default async function BriefingDetailPage({
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <Link href="/briefings" className="text-sm text-indigo-600 hover:underline mb-2 inline-block">
+          <Link href="/briefings" className="text-sm text-violet-600 hover:underline mb-2 inline-block">
             ← All Briefings
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Competitive Briefing</h1>
@@ -76,8 +76,8 @@ export default async function BriefingDetailPage({
       </div>
 
       {briefing.executive_summary && (
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-6">
-          <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-2">Executive Summary</p>
+        <div className="bg-gradient-to-br from-violet-50 to-blue-50 border border-violet-100 rounded-xl p-6">
+          <p className="text-xs font-semibold text-violet-500 uppercase tracking-wide mb-2">Executive Summary</p>
           <p className="text-gray-800 leading-relaxed">{briefing.executive_summary}</p>
         </div>
       )}

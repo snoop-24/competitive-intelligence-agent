@@ -63,7 +63,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
         <div className="mb-8 text-center">
-          <span className="text-2xl font-bold text-indigo-600">IntelAgent</span>
+          <span className="text-2xl font-bold text-violet-600">IntelAgent</span>
           <h1 className="text-xl font-semibold text-gray-900 mt-4">Welcome back</h1>
           <p className="text-sm text-gray-500 mt-1">Sign in to your account</p>
         </div>
@@ -87,14 +87,14 @@ export default function LoginPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               placeholder="you@company.com" required autoComplete="email"
             />
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-gray-700">Password</label>
-              <Link href="/forgot-password" className="text-xs text-indigo-600 hover:underline">
+              <Link href="/forgot-password" className="text-xs text-violet-600 hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 placeholder="••••••••" required autoComplete="current-password"
               />
               <button
@@ -121,7 +121,7 @@ export default function LoginPage() {
 
           <button
             type="submit" disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 text-sm transition-colors"
+            className="w-full bg-violet-600 text-white py-2.5 rounded-lg font-medium hover:bg-violet-700 disabled:opacity-50 text-sm transition-colors"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
@@ -129,7 +129,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           No account?{' '}
-          <Link href="/signup" className="text-indigo-600 hover:underline font-medium">Create one</Link>
+          <Link href="/signup" className="text-violet-600 hover:underline font-medium">Create one</Link>
         </p>
       </div>
     </div>

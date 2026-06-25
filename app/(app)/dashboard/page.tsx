@@ -40,8 +40,8 @@ export default async function DashboardPage() {
 
       {competitors.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
@@ -51,7 +51,7 @@ export default async function DashboardPage() {
           </p>
           <Link
             href="/competitors"
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
           >
             Add Competitor
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="font-semibold text-gray-900">Latest Briefing</h2>
-                  <Link href={`/briefings/${latestBriefing.id}`} className="text-sm text-indigo-600 hover:underline">
+                  <Link href={`/briefings/${latestBriefing.id}`} className="text-sm text-violet-600 hover:underline">
                     View full →
                   </Link>
                 </div>
@@ -92,12 +92,12 @@ export default async function DashboardPage() {
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Tracked</h2>
-                <Link href="/competitors" className="text-xs text-indigo-600 hover:underline">Manage</Link>
+                <Link href="/competitors" className="text-xs text-violet-600 hover:underline">Manage</Link>
               </div>
               <ul className="space-y-3">
                 {competitors.map(c => (
                   <li key={c.id} className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs flex-shrink-0">
+                    <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs flex-shrink-0">
                       {c.name[0].toUpperCase()}
                     </div>
                     <div className="min-w-0">
