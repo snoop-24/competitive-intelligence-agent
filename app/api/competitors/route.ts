@@ -33,12 +33,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 })
   }
 
-  const { data: workspace } = await supabase
+  let { data: workspace } = await supabase
     .from('workspaces')
     .select('id')
     .eq('owner_id', user.id)
     .single()
-  if (!workspace) return NextResponse.json({ error: 'No workspace found' }, { status: 404 })
+
+  if (!workspace) {
+    const { data } = await supabase
+      .from('workspaces')
+      .insert({ name: user.user_metadata?.company_name ?? 'My Workspace', owner_id: user.id })
+      .select('id')
+      .single()
+    workspace = data
+  }
+
+  if (!workspace) return NextResponse.json({ error: 'Failed to create workspace' }, { status: 500 })
 
   const website_url = await discoverCompanyWebsite(name)
 
