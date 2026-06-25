@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+
+export const dynamic = 'force-dynamic'
 import { sendBriefingEmail } from '@/lib/email'
 import type { BriefingItem, Competitor, Briefing } from '@/lib/supabase/types'
 

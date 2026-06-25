@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 import type { BriefingItem, Competitor, Briefing } from './supabase/types'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const getResend = () => new Resend(process.env.RESEND_API_KEY)
 
 export async function sendBriefingEmail({
   to,
@@ -41,7 +41,7 @@ export async function sendBriefingEmail({
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
   })
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: 'Competitive Intelligence <onboarding@resend.dev>',
     to,
     subject: `Competitive Briefing — ${date}`,
@@ -83,7 +83,7 @@ export async function sendHighSeverityAlert({
 
   const competitorNames = [...new Set(items.map(i => competitors.find(c => c.id === i.competitor_id)?.name ?? 'Unknown'))].join(', ')
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: 'IntelAgent Alerts <onboarding@resend.dev>',
     to,
     subject: `🚨 Urgent competitive signal: ${competitorNames}`,
