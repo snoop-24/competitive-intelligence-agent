@@ -52,38 +52,49 @@ export async function POST() {
         const signals: RawSignal[] = []
 
         for (const competitor of competitors as Competitor[]) {
-          try {
-            const content = await scrapeUrl(competitor.website_url)
-            const hash = await sha256(content)
+          let origin = competitor.website_url
+          try { origin = new URL(competitor.website_url).origin } catch { /* keep as-is */ }
 
-            // skip if we already processed this exact content
-            const { data: existing } = await supabase
-              .from('signals')
-              .select('id')
-              .eq('competitor_id', competitor.id)
-              .eq('content_hash', hash)
-              .limit(1)
-              .single()
+          const urlsToScrape = [
+            competitor.website_url,
+            `${origin}/pricing`,
+            `${origin}/blog`,
+            `${origin}/changelog`,
+          ]
 
-            if (existing) continue // unchanged since last run
+          for (const pageUrl of urlsToScrape) {
+            try {
+              const content = await scrapeUrl(pageUrl)
+              const hash = await sha256(content)
 
-            signals.push({
-              competitor_id: competitor.id,
-              competitor_name: competitor.name,
-              source_type: 'website',
-              raw_content: content.slice(0, 3000),
-              url: competitor.website_url,
-            })
+              const { data: existing } = await supabase
+                .from('signals')
+                .select('id')
+                .eq('competitor_id', competitor.id)
+                .eq('content_hash', hash)
+                .limit(1)
+                .single()
 
-            await supabase.from('signals').insert({
-              competitor_id: competitor.id,
-              source_type: 'website',
-              raw_content: content.slice(0, 3000),
-              url: competitor.website_url,
-              content_hash: hash,
-              is_meaningful: null,
-            })
-          } catch { /* skip failed scrapes */ }
+              if (existing) continue
+
+              signals.push({
+                competitor_id: competitor.id,
+                competitor_name: competitor.name,
+                source_type: 'website',
+                raw_content: content.slice(0, 3000),
+                url: pageUrl,
+              })
+
+              await supabase.from('signals').insert({
+                competitor_id: competitor.id,
+                source_type: 'website',
+                raw_content: content.slice(0, 3000),
+                url: pageUrl,
+                content_hash: hash,
+                is_meaningful: null,
+              })
+            } catch { /* skip pages that fail or 404 */ }
+          }
         }
 
         // ── Fetch news with URL deduplication ────────────────────────────

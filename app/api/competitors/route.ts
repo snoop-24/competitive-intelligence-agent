@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+import { discoverCompanyWebsite } from '@/lib/discovery'
 
 export async function GET() {
   const supabase = await createServerClient()
@@ -27,9 +28,9 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { name, website_url, description } = await request.json()
-  if (!name || !website_url) {
-    return NextResponse.json({ error: 'name and website_url are required' }, { status: 400 })
+  const { name, description } = await request.json()
+  if (!name) {
+    return NextResponse.json({ error: 'name is required' }, { status: 400 })
   }
 
   const { data: workspace } = await supabase
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
     .eq('owner_id', user.id)
     .single()
   if (!workspace) return NextResponse.json({ error: 'No workspace found' }, { status: 404 })
+
+  const website_url = await discoverCompanyWebsite(name)
 
   const { data: competitor, error } = await supabase
     .from('competitors')
