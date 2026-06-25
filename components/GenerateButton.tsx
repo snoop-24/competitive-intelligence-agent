@@ -113,8 +113,8 @@ export function GenerateButton() {
       </button>
 
       {running && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Running analysis</p>
+        <div className="bg-slate-900 rounded-xl border border-slate-800 p-5 space-y-3">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Running analysis</p>
           {STEPS.map((step, idx) => {
             const isComplete = completedSteps.has(idx)
             const isActive = activeStep === idx && !isComplete
@@ -122,19 +122,19 @@ export function GenerateButton() {
               <div key={idx} className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                   {isComplete ? (
-                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : isActive ? (
-                    <svg className="w-4 h-4 text-violet-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-violet-400 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                   ) : (
-                    <div className="w-4 h-4 rounded-full border-2 border-gray-200" />
+                    <div className="w-4 h-4 rounded-full border-2 border-slate-700" />
                   )}
                 </div>
-                <span className={`text-sm ${isComplete ? 'text-gray-500 line-through' : isActive ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+                <span className={`text-sm ${isComplete ? 'text-slate-600 line-through' : isActive ? 'text-white font-medium' : 'text-slate-500'}`}>
                   {step}
                 </span>
               </div>
@@ -144,7 +144,7 @@ export function GenerateButton() {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3 text-sm">{error}</div>
       )}
     </div>
   )

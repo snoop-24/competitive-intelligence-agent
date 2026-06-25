@@ -33,38 +33,38 @@ export function AddCompetitorForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
-      <h2 className="font-semibold text-gray-900">Add Competitor</h2>
+    <form onSubmit={handleSubmit} className="bg-slate-900 rounded-xl border border-slate-800 p-6 space-y-4">
+      <h2 className="font-semibold text-white">Add Competitor</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Company name</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">Company name</label>
           <input
             placeholder="e.g. Notion" value={name}
             onChange={e => setName(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            className="w-full bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             required
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">URL to monitor</label>
+          <label className="block text-xs font-medium text-slate-400 mb-1">URL to monitor</label>
           <input
             placeholder="https://competitor.com/pricing" value={url}
             onChange={e => setUrl(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            className="w-full bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             required type="url"
           />
         </div>
       </div>
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">Description <span className="text-gray-400">(optional)</span></label>
+        <label className="block text-xs font-medium text-slate-400 mb-1">Description <span className="text-slate-600">(optional)</span></label>
         <input
           placeholder="Brief description of what they do" value={description}
           onChange={e => setDescription(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+          className="w-full bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
         />
       </div>
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3 text-sm">{error}</div>
       )}
       <button
         type="submit" disabled={loading}
