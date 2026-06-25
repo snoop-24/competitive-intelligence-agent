@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+
+export const dynamic = 'force-dynamic'
 import { scrapeUrl } from '@/lib/scraper'
 import { fetchNews } from '@/lib/news'
 import { judgeSignals, extractObservations, generateBriefing, type RawSignal } from '@/lib/synthesizer'

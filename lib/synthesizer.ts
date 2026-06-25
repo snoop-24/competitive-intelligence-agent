@@ -1,7 +1,7 @@
 import Groq from 'groq-sdk'
 import type { Competitor } from './supabase/types'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 export interface RawSignal {
   competitor_id: string
@@ -65,7 +65,7 @@ Content: ${s.raw_content.slice(0, 600)}`
 Respond with JSON: {"signals": [{"is_meaningful": boolean, "category": "pricing"|"product"|"hiring"|"news"|"positioning"|"other"}]}
 One entry per signal, same order. Meaningful = shows pricing changes, new features, strategic news, or hiring patterns. Not meaningful = generic marketing, boilerplate, unchanged content.`
 
-  const completion = await groq.chat.completions.create({
+  const completion = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
@@ -109,7 +109,7 @@ Respond with JSON: {"observations": [{"competitor_name": string, "what_changed":
 - evidence: direct quote from content
 - severity: high=major strategic shift, medium=notable change, low=minor update`
 
-  const completion = await groq.chat.completions.create({
+  const completion = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
@@ -170,7 +170,7 @@ Respond with JSON: {"executive_summary": string, "items": [{"competitor_name": s
 - interpretation: bold strategic inference — WHY this likely happened, what it signals, what your company should do. Go beyond description: "This likely means X, possibly because Y, which suggests Z."
 - Include ALL competitors from the observations`
 
-  const completion = await groq.chat.completions.create({
+  const completion = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
