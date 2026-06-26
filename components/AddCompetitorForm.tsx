@@ -30,55 +30,83 @@ export function AddCompetitorForm() {
     router.refresh()
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%', background: 'var(--surface)', border: '1px solid var(--border-2)',
+    borderRadius: 6, padding: '8px 12px', fontSize: 13, color: 'var(--text)',
+    outline: 'none', fontFamily: 'var(--font-dm-sans)',
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="bg-slate-900 rounded-xl border border-slate-800 p-6 space-y-4">
-      <div>
-        <h2 className="font-semibold text-white">Add Competitor</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Enter a company name — we&apos;ll automatically discover what to monitor.</p>
+    <form onSubmit={handleSubmit} style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 8, padding: 20 }}>
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 600, fontSize: 13, color: 'var(--text)', marginBottom: 4 }}>
+          Add Competitor
+        </p>
+        <p style={{ fontSize: 12, color: 'var(--dim)' }}>
+          Enter a company name — we&apos;ll automatically discover what to monitor.
+        </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Company name</label>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)', marginBottom: 5 }}>
+            Company name
+          </label>
           <input
             placeholder="e.g. Notion, Linear, Figma"
             value={name}
             onChange={e => setName(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            style={inputStyle}
             required
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">
-            Description <span className="text-slate-600">(optional)</span>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'var(--muted)', marginBottom: 5 }}>
+            Description <span style={{ color: 'var(--dim)' }}>(optional)</span>
           </label>
           <input
-            placeholder="Brief description of what they do"
+            placeholder="What they do"
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            style={inputStyle}
           />
         </div>
       </div>
+
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3 text-sm">{error}</div>
+        <div style={{ background: 'rgba(255,77,77,0.1)', border: '1px solid rgba(255,77,77,0.2)', borderRadius: 6, padding: '8px 12px', fontSize: 12, color: 'var(--alert)', marginBottom: 12 }}>
+          {error}
+        </div>
       )}
+
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7,
+          background: loading ? 'rgba(0,212,170,0.06)' : 'rgba(0,212,170,0.1)',
+          border: '1px solid rgba(0,212,170,0.25)', borderRadius: 6,
+          padding: '8px 16px', fontSize: 13, fontWeight: 500, color: 'var(--accent)',
+          cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1,
+          fontFamily: 'var(--font-dm-sans)',
+        }}
       >
         {loading ? (
           <>
-            <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3} style={{ animation: 'spin 1s linear infinite' }}>
+              <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+              <path strokeOpacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
             Discovering {name || 'company'}...
           </>
         ) : (
-          'Add Competitor'
+          <>
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+            Add Competitor
+          </>
         )}
       </button>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </form>
   )
 }

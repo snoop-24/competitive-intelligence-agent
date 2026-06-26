@@ -2,10 +2,10 @@ import { createServerClient } from '@/lib/supabase/server'
 import type { Briefing } from '@/lib/supabase/types'
 import Link from 'next/link'
 
-const statusBadge: Record<string, string> = {
-  complete: 'bg-green-500/10 text-green-400 border border-green-500/20',
-  generating: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-  error: 'bg-red-500/10 text-red-400 border border-red-500/20',
+const statusStyle: Record<string, React.CSSProperties> = {
+  complete:   { background: 'rgba(0,212,170,0.1)',  color: '#00D4AA', border: '1px solid rgba(0,212,170,0.2)'  },
+  generating: { background: 'rgba(245,166,35,0.1)', color: '#F5A623', border: '1px solid rgba(245,166,35,0.2)' },
+  error:      { background: 'rgba(255,77,77,0.1)',  color: '#FF4D4D', border: '1px solid rgba(255,77,77,0.2)'  },
 }
 
 export default async function BriefingsPage() {
@@ -13,10 +13,7 @@ export default async function BriefingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('id')
-    .eq('owner_id', user!.id)
-    .single()
+    .from('workspaces').select('id').eq('owner_id', user!.id).single()
 
   const briefings: Briefing[] = workspace
     ? (await supabase.from('briefings').select('*').eq('workspace_id', workspace.id)
@@ -24,48 +21,53 @@ export default async function BriefingsPage() {
     : []
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-10 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Briefings</h1>
-        <p className="text-sm text-slate-500 mt-1">Your competitive intelligence history</p>
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 32px' }}>
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 700, fontSize: 22, letterSpacing: '-0.4px', color: 'var(--text)', marginBottom: 4 }}>
+          Briefings
+        </h1>
+        <p style={{ fontSize: 13, color: 'var(--muted)' }}>Your competitive intelligence history</p>
       </div>
 
       {briefings.length === 0 ? (
-        <div className="bg-slate-900 rounded-xl border border-slate-800 p-12 text-center">
-          <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 8, padding: 48, textAlign: 'center' }}>
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(168,85,247,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+            <svg width="20" height="20" fill="none" stroke="#A855F7" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-white mb-1">No briefings yet</h3>
-          <p className="text-sm text-slate-500 mb-5">Generate your first competitive intelligence briefing from the dashboard.</p>
+          <p style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 600, fontSize: 14, color: 'var(--text)', marginBottom: 6 }}>No briefings yet</p>
+          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 18 }}>Generate your first competitive intelligence briefing from the dashboard.</p>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 500, color: 'var(--accent)', background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.2)', borderRadius: 6, padding: '7px 14px' }}
           >
             Go to Dashboard
           </Link>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {briefings.map(b => (
             <li key={b.id}>
               <Link
                 href={`/briefings/${b.id}`}
-                className="block bg-slate-900 rounded-xl border border-slate-800 p-5 hover:border-violet-500/50 hover:bg-slate-800/50 transition-all"
+                style={{ display: 'block', background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 8, padding: '16px 18px', textDecoration: 'none', transition: 'border-color 0.15s' }}
               >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <p className="text-sm font-semibold text-white">
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+                  <p style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 600, fontSize: 13, color: 'var(--text)' }}>
                     {new Date(b.generated_at).toLocaleDateString('en-US', {
                       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
                     })}
                   </p>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium capitalize flex-shrink-0 ${statusBadge[b.status] ?? 'bg-slate-500/10 text-slate-400'}`}>
+                  <span style={{ fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 20, textTransform: 'capitalize', flexShrink: 0, ...(statusStyle[b.status] ?? statusStyle.error) }}>
                     {b.status}
                   </span>
                 </div>
                 {b.executive_summary && (
-                  <p className="text-sm text-slate-400 leading-relaxed line-clamp-2">{b.executive_summary}</p>
+                  <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--muted)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {b.executive_summary}
+                  </p>
                 )}
               </Link>
             </li>

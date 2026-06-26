@@ -8,9 +8,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
       <Sidebar email={user.email ?? ''} />
-      <main className="ml-60 min-h-screen">
+      <main className="flex-1" style={{ marginLeft: 60 }}>
         {children}
       </main>
     </div>

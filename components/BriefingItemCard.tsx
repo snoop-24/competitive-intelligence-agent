@@ -1,61 +1,48 @@
 import type { BriefingItem, Competitor } from '@/lib/supabase/types'
 
-const severityLeftBorder: Record<string, string> = {
-  high: 'border-l-4 border-l-red-500',
-  medium: 'border-l-4 border-l-amber-500',
-  low: 'border-l-4 border-l-slate-600',
+const COMP_COLORS = ['#00D4AA','#A855F7','#22C55E','#F5A623','#58A6FF','#F78166','#E3B341','#79C0FF']
+
+const CATEGORY_COLOR: Record<string, string> = {
+  pricing: '#F5A623', product: '#22C55E', hiring: '#A855F7',
+  news: '#58A6FF', positioning: '#79C0FF', other: '#8B949E',
 }
 
-const severityBadge: Record<string, string> = {
-  high: 'bg-red-500/10 text-red-400 border border-red-500/20',
-  medium: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-  low: 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
+const IMPACT_COLOR: Record<string, string> = {
+  high: '#FF4D4D', medium: '#F5A623', low: '#8B949E',
 }
 
-const categoryLabel: Record<string, string> = {
-  pricing: 'Pricing',
-  product: 'Product',
-  hiring: 'Hiring',
-  news: 'News',
-  positioning: 'Positioning',
-  other: 'Other',
-}
-
-export function BriefingItemCard({
-  item,
-  competitors,
-}: {
-  item: BriefingItem
-  competitors: Competitor[]
-}) {
-  const competitor = competitors.find(c => c.id === item.competitor_id)
-  const borderClass = severityLeftBorder[item.severity] ?? severityLeftBorder.low
-  const badgeClass = severityBadge[item.severity] ?? severityBadge.low
+export function BriefingItemCard({ item, competitors }: { item: BriefingItem; competitors: Competitor[] }) {
+  const competitorIdx = competitors.findIndex(c => c.id === item.competitor_id)
+  const competitor = competitors[competitorIdx]
+  const compColor = COMP_COLORS[competitorIdx >= 0 ? competitorIdx % COMP_COLORS.length : 0]
+  const typeColor = CATEGORY_COLOR[item.category] ?? '#8B949E'
+  const impactColor = IMPACT_COLOR[item.severity] ?? '#8B949E'
 
   return (
-    <div className={`bg-slate-900 rounded-xl border border-slate-800 ${borderClass} overflow-hidden`}>
-      <div className="p-5 space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-semibold text-sm text-white">{competitor?.name ?? 'Unknown'}</p>
-            <p className="text-xs text-slate-500 mt-0.5 capitalize">{categoryLabel[item.category] ?? item.category}</p>
-          </div>
-          <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize flex-shrink-0 ${badgeClass}`}>
-            {item.severity}
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What changed</p>
-            <p className="text-sm text-slate-300 leading-relaxed">{item.observation}</p>
-          </div>
-          <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-3.5">
-            <p className="text-xs font-semibold text-violet-400 uppercase tracking-wide mb-1">Strategic interpretation</p>
-            <p className="text-sm text-violet-200 leading-relaxed">{item.interpretation}</p>
-          </div>
-        </div>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 8, padding: '13px 14px' }}>
+      <div className="flex items-center gap-2 mb-2">
+        <span style={{ fontSize: 11, fontWeight: 600, color: compColor }}>
+          {competitor?.name ?? 'Unknown'}
+        </span>
+        <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: typeColor }} />
+        <span style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'capitalize' }}>{item.category}</span>
+        <div className="ml-auto w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ background: impactColor }} />
       </div>
+
+      <p style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--text)', marginBottom: item.interpretation ? 10 : 0 }}>
+        {item.observation}
+      </p>
+
+      {item.interpretation && (
+        <div style={{ padding: '10px 12px', borderRadius: 6, background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.15)', borderLeft: '3px solid rgba(168,85,247,0.4)' }}>
+          <p style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#A855F7', marginBottom: 4 }}>
+            Strategic interpretation
+          </p>
+          <p style={{ fontSize: 12, lineHeight: 1.55, color: '#C4B5FD' }}>
+            {item.interpretation}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,30 +3,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Competitor } from '@/lib/supabase/types'
 
-function CompetitorFavicon({ url, name }: { url: string; name: string }) {
-  const [failed, setFailed] = useState(false)
-  let domain = ''
-  try { domain = new URL(url).hostname } catch { /* invalid url */ }
+const COMP_COLORS = ['#00D4AA','#A855F7','#22C55E','#F5A623','#58A6FF','#F78166','#E3B341','#79C0FF']
 
-  if (failed || !domain) {
-    return (
-      <div className="w-9 h-9 rounded-lg bg-violet-500/20 flex items-center justify-center text-violet-400 font-bold text-sm flex-shrink-0">
-        {name[0]?.toUpperCase() ?? '?'}
-      </div>
-    )
-  }
+function compAbbr(name: string) {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+}
 
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
-      alt=""
-      width={36}
-      height={36}
-      className="w-9 h-9 rounded-lg object-contain flex-shrink-0 bg-slate-800 border border-slate-700 p-1"
-      onError={() => setFailed(true)}
-    />
-  )
+function safeHostname(url: string) {
+  try { return new URL(url).hostname } catch { return url }
 }
 
 export function CompetitorList({ competitors }: { competitors: Competitor[] }) {
@@ -48,43 +32,77 @@ export function CompetitorList({ competitors }: { competitors: Competitor[] }) {
 
   if (competitors.length === 0) {
     return (
-      <div className="bg-slate-900 rounded-xl border border-slate-800 p-8 text-center">
-        <p className="text-sm text-slate-500">No competitors added yet. Use the form above to add one.</p>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 8, padding: 32, textAlign: 'center' }}>
+        <p style={{ fontSize: 13, color: 'var(--muted)' }}>No competitors added yet. Use the form above to add one.</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', borderRadius: 8, overflow: 'hidden' }}>
       {deleteError && (
-        <div className="bg-red-500/10 border-b border-red-500/20 text-red-400 px-4 py-3 text-sm">{deleteError}</div>
+        <div style={{ background: 'rgba(255,77,77,0.1)', borderBottom: '1px solid rgba(255,77,77,0.2)', padding: '10px 16px', fontSize: 12, color: 'var(--alert)' }}>
+          {deleteError}
+        </div>
       )}
-      <ul className="divide-y divide-slate-800">
-        {competitors.map(c => (
-          <li key={c.id} className="flex items-center gap-4 px-5 py-4">
-            <CompetitorFavicon url={c.website_url} name={c.name} />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm text-white">{c.name}</p>
-              <a
-                href={c.website_url} target="_blank" rel="noreferrer"
-                className="text-xs text-violet-400 hover:underline truncate block max-w-sm"
-              >
-                {c.website_url}
-              </a>
-              {c.description && (
-                <p className="text-xs text-slate-500 mt-0.5 truncate">{c.description}</p>
-              )}
-            </div>
-            <button
-              onClick={() => handleDelete(c.id)}
-              disabled={deleting === c.id}
-              className="text-xs text-slate-600 hover:text-red-400 disabled:opacity-40 transition-colors flex-shrink-0 ml-2"
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+        {competitors.map((c, i) => {
+          const color = COMP_COLORS[i % COMP_COLORS.length]
+          return (
+            <li
+              key={c.id}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < competitors.length - 1 ? '1px solid var(--border)' : 'none' }}
             >
-              {deleting === c.id ? 'Removing...' : 'Remove'}
-            </button>
-          </li>
-        ))}
+              {/* Avatar */}
+              <div
+                style={{ width: 32, height: 32, borderRadius: 6, background: `${color}1a`, color, fontFamily: 'var(--font-space-grotesk)', fontWeight: 700, fontSize: 9, letterSpacing: '-0.3px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+              >
+                {compAbbr(c.name)}
+              </div>
+
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {c.name}
+                </p>
+                <a
+                  href={c.website_url} target="_blank" rel="noreferrer"
+                  style={{ fontSize: 11, color: 'var(--accent)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', maxWidth: 320 }}
+                >
+                  {safeHostname(c.website_url)}
+                </a>
+                {c.description && (
+                  <p style={{ fontSize: 11, color: 'var(--dim)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>
+                    {c.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Delete */}
+              <button
+                onClick={() => handleDelete(c.id)}
+                disabled={deleting === c.id}
+                style={{ fontSize: 11, color: 'var(--dim)', background: 'none', border: 'none', cursor: deleting === c.id ? 'not-allowed' : 'pointer', opacity: deleting === c.id ? 0.5 : 1, flexShrink: 0, padding: '4px 8px', borderRadius: 4 }}
+                onMouseEnter={e => { if (deleting !== c.id) (e.currentTarget as HTMLElement).style.color = 'var(--alert)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--dim)' }}
+              >
+                {deleting === c.id ? 'Removing...' : 'Remove'}
+              </button>
+            </li>
+          )
+        })}
       </ul>
+
+      {/* Add row */}
+      <div style={{ padding: '10px 16px', borderTop: competitors.length > 0 ? '1px solid var(--border)' : 'none' }}>
+        <a
+          href="/competitors"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 5, border: '1px dashed var(--border-3)', fontSize: 11, color: 'var(--dim)', textDecoration: 'none' }}
+        >
+          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M6 1v10M1 6h10" /></svg>
+          Add competitor
+        </a>
+      </div>
     </div>
   )
 }

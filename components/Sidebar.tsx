@@ -8,8 +8,9 @@ const NAV_LINKS = [
     href: '/dashboard',
     label: 'Dashboard',
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
       </svg>
     ),
   },
@@ -17,8 +18,9 @@ const NAV_LINKS = [
     href: '/competitors',
     label: 'Competitors',
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
       </svg>
     ),
   },
@@ -26,8 +28,9 @@ const NAV_LINKS = [
     href: '/briefings',
     label: 'Briefings',
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
       </svg>
     ),
   },
@@ -46,45 +49,67 @@ export function Sidebar({ email }: { email: string }) {
   }
 
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-60 bg-slate-900 border-r border-slate-700 flex flex-col z-10">
-      <div className="px-6 py-5 border-b border-slate-700">
-        <span className="text-xl font-bold text-white">IntelAgent</span>
-        <p className="text-xs text-slate-400 mt-0.5">Competitive Intelligence</p>
+    <div
+      className="fixed left-0 top-0 bottom-0 flex flex-col items-center py-4 z-10"
+      style={{ width: 60, background: 'var(--bg-deep)', borderRight: '1px solid var(--border)' }}
+    >
+      {/* Logo */}
+      <div
+        className="w-8 h-8 flex items-center justify-center mb-6 flex-shrink-0"
+        style={{ borderRadius: 7, background: 'linear-gradient(135deg, #00D4AA, #0EA5E9)' }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.6" />
+          <circle cx="8" cy="8" r="3.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.8" />
+          <circle cx="8" cy="8" r="1.5" fill="white" />
+        </svg>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      {/* Nav */}
+      <nav className="flex-1 flex flex-col items-center gap-1 w-full px-2">
         {NAV_LINKS.map(link => {
           const active = pathname === link.href || pathname.startsWith(link.href + '/')
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                active
-                  ? 'bg-slate-700 text-violet-400'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
+              title={link.label}
+              className="w-10 h-10 flex items-center justify-center transition-all"
+              style={{
+                borderRadius: 8,
+                background: active ? 'rgba(0,212,170,0.1)' : 'transparent',
+                border: active ? '1px solid rgba(0,212,170,0.2)' : '1px solid transparent',
+                color: active ? 'var(--accent)' : 'var(--dim)',
+              }}
             >
-              <span className={active ? 'text-violet-400' : 'text-slate-500'}>{link.icon}</span>
-              {link.label}
+              {link.icon}
             </Link>
           )
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-slate-700">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {initials}
-          </div>
-          <span className="text-xs text-slate-400 truncate min-w-0">{email}</span>
-        </div>
+      {/* Bottom */}
+      <div className="flex flex-col items-center gap-2 flex-shrink-0">
         <button
           onClick={handleSignOut}
-          className="w-full text-left text-xs text-slate-500 hover:text-red-400 transition-colors px-1 py-1"
+          title="Sign out"
+          className="w-10 h-10 flex items-center justify-center transition-all"
+          style={{ borderRadius: 8, color: 'var(--dim)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--alert)'; (e.currentTarget as HTMLElement).style.background = 'var(--surface)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--dim)'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
         >
-          Sign out
+          <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
         </button>
+
+        <div
+          className="w-8 h-8 flex items-center justify-center flex-shrink-0"
+          title={email}
+          style={{ borderRadius: '50%', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', fontFamily: 'var(--font-space-grotesk)', fontSize: 10, fontWeight: 600, color: 'white' }}
+        >
+          {initials}
+        </div>
       </div>
     </div>
   )

@@ -8,25 +8,28 @@ export default async function CompetitorsPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('id')
-    .eq('owner_id', user!.id)
-    .single()
+    .from('workspaces').select('id').eq('owner_id', user!.id).single()
 
   const competitors: Competitor[] = workspace
     ? (await supabase.from('competitors').select('*').eq('workspace_id', workspace.id).order('created_at')).data ?? []
     : []
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-10 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Competitors</h1>
-        <p className="text-sm text-slate-500 mt-1">
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 32px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 700, fontSize: 22, letterSpacing: '-0.4px', color: 'var(--text)', marginBottom: 4 }}>
+          Competitors
+        </h1>
+        <p style={{ fontSize: 13, color: 'var(--muted)' }}>
           {competitors.length} competitor{competitors.length !== 1 ? 's' : ''} tracked
         </p>
       </div>
-      <AddCompetitorForm />
-      <CompetitorList competitors={competitors} />
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <AddCompetitorForm />
+        <CompetitorList competitors={competitors} />
+      </div>
     </div>
   )
 }
